@@ -1782,6 +1782,60 @@ own future independent READINESS evaluation; it does not start,
 authorize, or complete any T002 work.
 ```
 
+### 11.2 T002 Lifecycle / Closure-Evidence Record (Pending Closure Gate)
+
+``` text
+T002 READINESS = READY_FOR_IMPLEMENTATION
+
+Implementation = COMPLETED
+Local validation = 131 tests GREEN (52 pre-existing T001 tests + 79 new
+T002 domain-model tests)
+
+Independent CODE Review:
+BLOCKER = 0
+IMPORTANT = 0
+MINOR = 0
+Final Gate = READY_TO_COMMIT
+
+HUMAN_APPROVAL = GRANTED (candidate-bound, prior to commit)
+
+Commit = 55dbd36dc233f1c95db629327150c28e2ffb73db
+Push = COMPLETED
+Remote verification: HEAD == origin/main ==
+55dbd36dc233f1c95db629327150c28e2ffb73db (independently reconfirmed from
+Git at the time this record was written)
+Working tree after push = CLEAN
+Repository mismatch = NONE
+
+Hosted CI Evidence:
+Provider = GitHub Actions
+Workflow = CI
+Run = CI #3
+Branch = main
+head_sha = 55dbd36dc233f1c95db629327150c28e2ffb73db (exact match to the
+T002 expected commit)
+Result = GREEN / successful
+Evidence source = HUMAN-OBSERVED. The human directly viewed this GitHub
+Actions run result in the GitHub Actions UI and reported it. This is
+explicitly NOT a Claude/API-independent verification: local GitHub CLI
+authentication in this environment is invalid (`gh auth status` reports
+an invalid keyring token; `gh run list` / `gh api` return HTTP 401 Bad
+credentials). Per explicit instruction, this local authentication
+failure does not invalidate the human-observed result -- it only means
+the result is recorded here as human-observed evidence rather than
+machine/API-verified evidence, and any subsequent Closure Gate
+evaluation must treat it accordingly.
+
+T002 status = NOT CLOSED
+T002 status = CLOSURE_PENDING_RE_EVALUATION
+
+This record persists the evidence items above for a subsequent, explicit
+T002 Closure Gate evaluation. Recording this evidence here is not itself
+a Closure Gate decision and does not itself close T002.
+
+Required Next Action = COMMIT_T002_CLOSURE_EVIDENCE
+```
+
 ------------------------------------------------------------------------
 
 # End of TASKS
