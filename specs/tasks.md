@@ -1711,6 +1711,77 @@ CODE phase = AUTHORIZED
 Required Next Action = RESTORE_TASKS_READY_AND_RESUME_T001_READINESS
 ```
 
+This TASKS artifact gate state (`TASKS = TASKS_READY`, `CODE phase = AUTHORIZED`)
+is distinct from, and does not by itself imply, the CLOSED status of any
+individual TASK. Individual TASK closure is recorded separately below.
+
+### 11.1 T001 Task Closure Record
+
+``` text
+T001 Iteration 1 (historical):
+Implementation commit = f6b2f54d722e7593b61df34c78e71a6aaacfefd1
+Pushed = YES
+Hosted CI applicable evidence = NONE (predates repository Hosted CI
+workflow; workflow did not exist at this commit)
+T001 CLOSED = NO (remains historical, non-CLOSED, not rewritten)
+
+RETURN_TO_TASKS:
+Reason = repository Hosted CI bootstrap ownership gap (no TASK owned
+creation of the repository's Hosted CI workflow)
+TASKS-BOOTSTRAP-001 = BLOCKER -> FIX_TASKS -> FIXED_PENDING_RE_REVIEW
+-> Independent TASKS Re-Review = COMPLETED -> TASKS-BOOTSTRAP-001 = RESOLVED
+(full history preserved above in this section)
+
+T001 Iteration 2:
+READINESS = READY_FOR_IMPLEMENTATION
+Implementation = COMPLETED (repository Hosted CI bootstrap workflow
+added: .github/workflows/ci.yml)
+Local validation = 52 tests GREEN
+
+Independent CODE Review:
+BLOCKER = 0
+IMPORTANT = 0
+MINOR = 0
+Final Gate = READY_TO_COMMIT
+
+HUMAN_APPROVAL = GRANTED (candidate-bound, prior to commit)
+
+Commit = 424ce4e722bfa1c6e83cc9e06d2e2d0a4a81b197
+Push = COMPLETED
+Remote verification: HEAD == origin/main == 424ce4e722bfa1c6e83cc9e06d2e2d0a4a81b197
+Working tree after push = CLEAN
+Repository mismatch = NONE
+
+Hosted CI Evidence:
+Provider = GitHub Actions
+Trigger = push (ordinary trigger; no workflow_dispatch; no retroactive
+mechanism)
+head_sha = 424ce4e722bfa1c6e83cc9e06d2e2d0a4a81b197 (exact match to
+expected commit)
+Run = first run for this workflow (run_number = 1)
+Status = completed
+Conclusion = success (GREEN)
+
+T001 Closure Gate:
+Review gate satisfied = YES
+READY_TO_COMMIT applicable = YES
+Human commit approval applicable to committed candidate = YES
+Current expected candidate committed = YES
+Current expected commit pushed = YES
+Expected remote target corresponds = YES
+Unresolved repository mismatch = NONE
+Hosted CI GREEN applicable to current expected commit = YES
+Closure Gate Decision = T001_CLOSURE_ELIGIBLE
+
+T001 = CLOSED
+T001 CLOSED expected commit = 424ce4e722bfa1c6e83cc9e06d2e2d0a4a81b197
+
+T002 dependency on T001 = CLOSED is now satisfied.
+T002 = NOT_STARTED. T001 CLOSED makes T002 potentially eligible for its
+own future independent READINESS evaluation; it does not start,
+authorize, or complete any T002 work.
+```
+
 ------------------------------------------------------------------------
 
 # End of TASKS
