@@ -12,6 +12,12 @@ gate/policy behavior and routing decisions (T005), validation execution
 """
 
 from sdd_agent.domain.models.attempt import Attempt, NextAuthorizedAction
+from sdd_agent.domain.models.candidate import (
+    CandidateEntry,
+    CandidateEntryKind,
+    CandidateIdentity,
+    CandidateSnapshot,
+)
 from sdd_agent.domain.models.ci import CIResult
 from sdd_agent.domain.models.enums import (
     CIStatus,
@@ -26,6 +32,7 @@ from sdd_agent.domain.models.enums import (
     WaiverEligibleCause,
 )
 from sdd_agent.domain.models.event import WorkflowEvent
+from sdd_agent.domain.models.git_status import WorktreeStatus
 from sdd_agent.domain.models.human_decision import HumanDecision
 from sdd_agent.domain.models.identity import EvidenceContext
 from sdd_agent.domain.models.implementation import ImplementationReport
@@ -43,6 +50,10 @@ __all__ = [
     "Attempt",
     "CIResult",
     "CIStatus",
+    "CandidateEntry",
+    "CandidateEntryKind",
+    "CandidateIdentity",
+    "CandidateSnapshot",
     "Condition",
     "EvidenceContext",
     "Finding",
@@ -64,4 +75,5 @@ __all__ = [
     "ValidationWaiver",
     "WaiverEligibleCause",
     "WorkflowEvent",
+    "WorktreeStatus",
 ]
