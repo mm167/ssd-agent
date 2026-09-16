@@ -3486,36 +3486,29 @@ Initial gate = PLAN_NEEDS_FIXES
 Independent PLAN Re-review #1 = COMPLETED
 Re-review gate = PLAN_NEEDS_FIXES
 
+PLAN-R001 = RESOLVED
 PLAN-R002 = RESOLVED
 PLAN-R003 = RESOLVED
 PLAN-R004 = RESOLVED
-PLAN-R001 = PARTIALLY_RESOLVED in Re-review #1
 
 PLAN-095 untracked-file inclusion rule = integrated
 PLAN-096 Git-ignore candidate identity rule = integrated
 
 Independent PLAN Re-review #2 of remaining PLAN-R001 = COMPLETED
-Re-review #2 gate = PLAN_READY
 
-PLAN-R001 = RESOLVED
+Current findings:
 
 BLOCKER = 0
 IMPORTANT = 0
+MINOR = 0
+
+Final gate = PLAN_READY
 
 PLAN status = PLAN_READY
-```
 
-TASKS may begin because independent PLAN re-review confirmed:
+TASKS phase = AUTHORIZED
 
-``` text
-BLOCKER = 0
-IMPORTANT = 0
-```
-
-and therefore:
-
-``` text
-PLAN_READY
+CODE = FORBIDDEN until TASKS_READY
 ```
 
 ------------------------------------------------------------------------
