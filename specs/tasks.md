@@ -1826,14 +1826,22 @@ the result is recorded here as human-observed evidence rather than
 machine/API-verified evidence, and any subsequent Closure Gate
 evaluation must treat it accordingly.
 
-T002 status = NOT CLOSED
-T002 status = CLOSURE_PENDING_RE_EVALUATION
+T002 Closure Gate (re-evaluated after the above evidence was persisted,
+committed, and pushed):
+Review gate satisfied = YES
+READY_TO_COMMIT applicable = YES
+Human commit approval applicable to committed candidate = YES
+Current expected candidate committed = YES
+Current expected commit pushed = YES
+Expected remote target corresponds = YES
+Unresolved repository mismatch = NONE
+Hosted CI GREEN applicable to current expected commit = YES
+(human-observed GitHub Actions evidence; workflow CI, run CI #3, branch
+main, head_sha = 55dbd36dc233f1c95db629327150c28e2ffb73db)
+Closure Gate Decision = T002_CLOSURE_ELIGIBLE
 
-This record persists the evidence items above for a subsequent, explicit
-T002 Closure Gate evaluation. Recording this evidence here is not itself
-a Closure Gate decision and does not itself close T002.
-
-Required Next Action = COMMIT_T002_CLOSURE_EVIDENCE
+T002 = CLOSED
+T002 CLOSED expected commit = 55dbd36dc233f1c95db629327150c28e2ffb73db
 ```
 
 ------------------------------------------------------------------------
