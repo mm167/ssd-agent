@@ -6,7 +6,7 @@
 -   **Phase:** TASKS
 -   **Specification Status:** SPEC_READY
 -   **Plan Status:** PLAN_READY
--   **TASKS Status:** TASKS_READY
+-   **TASKS Status:** TASKS_NEEDS_RE_REVIEW
 -   **Encoding:** UTF-8
 
 ------------------------------------------------------------------------
@@ -154,17 +154,21 @@ Title: Project Foundation, Configuration, Diagnostics
 Objective:
 Establish the Python package skeleton, configuration loading,
 provider-selection configuration, diagnostics boundaries,
-timeouts/retry settings, logs/evidence separation, and workspace-lock
-foundation.
+timeouts/retry settings, logs/evidence separation, workspace-lock
+foundation, and the minimal repository Hosted CI bootstrap required so
+that CODE tasks can obtain real Hosted CI evidence for their exact
+pushed commit from the first executable TASK onward.
 
 Dependencies: NONE
 
 SPEC Traceability:
 Sources of truth, artifact routing, recoverability, human authority, V1
-non-goals.
+non-goals, Hosted CI, current expected commit, CLOSED closure
+conditions (repository Hosted CI bootstrap precondition).
 
 PLAN Traceability:
-Sections 3, 6, 7, 76, 77, 78, 80, 81, 82, 83, 84, 98, 100, 101.
+Sections 3, 6, 7, 47, 48, 50, 76, 77, 78, 80, 81, 82, 83, 84, 98, 100,
+101.
 
 Scope:
 - Python 3.13+ project layout.
@@ -175,6 +179,9 @@ Scope:
 - Workspace lock primitive.
 - Structured diagnostics and technical error surfaces.
 - Timeout and retry configuration.
+- Repository Hosted CI bootstrap workflow (`.github/workflows/ci.yml`
+  or equivalent repository workflow path), triggered on push and
+  pull_request to the target branch.
 
 Deliverables:
 - Package skeleton.
@@ -182,6 +189,8 @@ Deliverables:
 - Diagnostics model.
 - Workspace lock primitive.
 - Timeout and retry configuration support.
+- Repository Hosted CI bootstrap workflow file
+  (`.github/workflows/ci.yml` or equivalent).
 
 Acceptance Criteria:
 - Invalid configuration blocks sensitive operations with explainable
@@ -190,17 +199,48 @@ Acceptance Criteria:
 - Provider mappings can express Claude Code, Codex, FakeAgentRunner,
   GitHub Actions, and Fake CI.
 - Workspace locking prevents concurrent unsafe orchestration.
+- The repository Hosted CI bootstrap workflow is part of the T001
+  candidate content itself, so the ordinary push-triggered Hosted CI
+  run for that candidate's exact commit SHA is observable as GREEN
+  through the configured Hosted CI provider.
+- The prior historical T001 commit
+  (f6b2f54d722e7593b61df34c78e71a6aaacfefd1) predates the workflow,
+  does not contain it, and is not required to and cannot obtain
+  applicable Hosted CI evidence. It remains historical and
+  non-CLOSED. T001 CLOSED is evaluated only against the new
+  candidate's own expected commit produced under this contract.
 
 Validation Expectations:
 - Unit tests for valid and invalid configuration.
 - Unit tests for secret rejection.
 - Unit tests for workspace lock acquisition and release.
 - Unit tests for diagnostic formatting.
+- Human-observed confirmation that the repository Hosted CI bootstrap
+  workflow executes the project's actual validation commands (not a
+  placeholder step) and produces a GREEN run for the exact new T001
+  candidate commit produced under this contract. This evidence
+  applies only to that new commit, never to the prior historical
+  commit f6b2f54d722e7593b61df34c78e71a6aaacfefd1.
 
 Explicit Exclusions / Future-Task Boundary:
 - No workflow execution.
 - No live provider calls.
 - No concrete agent or CI adapter behavior beyond configuration names.
+- No `CIProvider` port, `CIResult` model, or CI evidence
+  applicability/expected-commit rules; that belongs to T014.
+- No `FakeCIProvider`; that belongs to T014.
+- No `GitHubActionsAdapter` or other CI provider API/CLI integration
+  code inside the `sdd_agent` package; that belongs to T015.
+- No CI closure policy, CI failure classification, or CI failure
+  recovery orchestration; that belongs to T016.
+- The repository Hosted CI bootstrap workflow is repository/DevOps
+  configuration only. It has no dependency on, and does not
+  substitute for, T014, T015, or T016.
+- No retroactive Hosted CI evidence mechanism for commits that predate
+  the workflow's existence (including via `workflow_dispatch` or any
+  other manual trigger against an old ref/SHA). The prior historical
+  commit f6b2f54d722e7593b61df34c78e71a6aaacfefd1 cannot be made to
+  satisfy exact-commit Hosted CI evidence and is not required to.
 
 ------------------------------------------------------------------------
 
@@ -1574,7 +1614,7 @@ TASKS-D001 through TASKS-D007 = ACCEPTED
 
 tasks.md consolidation = COMPLETE
 
-TASKS status = TASKS_READY
+Previous TASKS status = TASKS_READY
 
 Independent TASKS Review = COMPLETED
 
@@ -1582,19 +1622,83 @@ TASKS-R001 = RESOLVED
 
 Independent TASKS RE-REVIEW = COMPLETED
 
-Current unresolved findings:
+Previous unresolved findings:
 
 BLOCKER = 0
 IMPORTANT = 0
 MINOR = 0
 
-Required Routing = NONE
+Previous Required Routing = NONE
 
-Final Gate = TASKS_READY
+Previous Final Gate = TASKS_READY
 
-CODE phase = AUTHORIZED
+Previous CODE phase = AUTHORIZED
 
 Initial ready TASK = T001
+
+TASKS correction = HUMAN_APPROVED
+Correction subject = T001 HOSTED CI BOOTSTRAP
+Classification = TASKS / DECOMPOSITION GAP
+
+Reason:
+No TASK owned creation of the repository's Hosted CI workflow. T001
+was committed and pushed (f6b2f54d722e7593b61df34c78e71a6aaacfefd1)
+but could not obtain applicable Hosted CI GREEN evidence, so T001
+could not become CLOSED, so T002's mandatory dependency on
+T001 = CLOSED could not be satisfied.
+
+Correction applied:
+T001 contract updated to own the minimal repository Hosted CI
+bootstrap (`.github/workflows/ci.yml` or equivalent) as explicit
+scope, deliverable, acceptance criteria, and validation expectation.
+T014 (CIProvider port + Fake CI), T015 (GitHub Actions adapter), and
+T016 (CI closure/failure recovery) are unchanged.
+
+T001 historical commit f6b2f54d722e7593b61df34c78e71a6aaacfefd1
+remains unmodified; history was not rewritten. A new T001 CODE
+iteration is required against the corrected contract, and must pass
+the normal cycle again:
+READINESS -> CODE -> VALIDATION -> REVIEW -> HUMAN APPROVAL -> COMMIT
+-> PUSH -> HOSTED CI -> CLOSED.
+
+T002 dependency on T001 is unchanged (still requires T001 = CLOSED).
+
+Independent TASKS Review of this correction = COMPLETED
+
+TASKS-BOOTSTRAP-001 = BLOCKER
+Classification = TASKS
+
+Finding:
+The T001 contract incorrectly required/implied that workflow_dispatch
+or an equivalent explicit-ref/SHA dispatch could give the historical
+pushed commit f6b2f54d722e7593b61df34c78e71a6aaacfefd1 applicable
+Hosted CI evidence, even though that commit does not contain the
+repository workflow. This conflicted with the approved exact-commit
+CI evidence model.
+
+Correction applied (FIX_TASKS):
+The retroactive CI recovery mechanism was removed from T001.
+`workflow_dispatch` was removed from T001 scope and acceptance
+criteria; it is not required to solve the bootstrap gap. T001 now
+explicitly states that f6b2f54d722e7593b61df34c78e71a6aaacfefd1
+remains historical, is not CLOSED, is not rewritten, and cannot
+obtain applicable Hosted CI evidence. Closure requires a new T001
+CODE iteration that produces a new candidate containing the
+repository Hosted CI workflow, passes the full lifecycle again
+(READINESS -> CODE -> VALIDATION -> INDEPENDENT REVIEW -> HUMAN
+APPROVAL -> COMMIT -> PUSH -> HOSTED CI -> CLOSED), and obtains
+Hosted CI GREEN bound to that exact new expected commit through the
+ordinary push trigger. T002 remains blocked on T001 = CLOSED.
+
+TASKS-BOOTSTRAP-001 = FIXED_PENDING_RE_REVIEW
+
+Current unresolved findings = PENDING RE-REVIEW OF TASKS-BOOTSTRAP-001
+
+Required Routing = RE_REVIEW_TASKS_BOOTSTRAP_001
+
+Final Gate = TASKS_NEEDS_RE_REVIEW
+
+CODE phase = FORBIDDEN until TASKS_READY is re-established
 ```
 
 ------------------------------------------------------------------------
