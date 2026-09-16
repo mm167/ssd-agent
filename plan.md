@@ -179,9 +179,11 @@ Conceptually:
     v                   v           v           v
 AgentRunner        GitRepository ValidationRunner CIProvider
     |                   |                       |
-+---+---+            Git CLI                Hosted CI
-|       |
-Claude  Codex
++---+---+            Git CLI             +----+----+
+|   |   |                                |         |
+Claude Codex Fake                     GitHub    Fake CI
+ Code Runner                          Actions   Adapter
+                                      Adapter
 ```
 
 External systems shall be accessed through ports.
@@ -548,7 +550,23 @@ AgentRunner
    +-- ClaudeCodeRunner
    |
    +-- CodexRunner
+   |
+   +-- FakeAgentRunner
 ```
+
+V1 shall provide concrete adapters for:
+
+``` text
+Claude Code
+Codex
+```
+
+The fake runner is mandatory for deterministic automated tests. It does
+not replace either required concrete V1 adapter.
+
+The Core depends on the `AgentRunner` abstraction and provider-neutral
+contracts. It must not depend directly on Claude Code or Codex
+implementation details.
 
 ------------------------------------------------------------------------
 
@@ -569,6 +587,7 @@ Conceptual providers:
 ``` text
 CLAUDE_CODE
 CODEX
+FAKE
 ```
 
 A project may therefore configure:
@@ -580,6 +599,25 @@ REVIEWER    -> Codex
 ```
 
 without hard-coding those relationships into the workflow.
+
+For example, a configuration may choose:
+
+``` text
+IMPLEMENTER -> Claude Code
+REVIEWER    -> Codex
+```
+
+This is configuration, not a Core invariant. The architecture must not
+hard-code:
+
+``` text
+IMPLEMENTER == Claude Code
+REVIEWER == Codex
+```
+
+Initial REVIEW independence remains a workflow and context property. The
+presence of separate Claude Code and Codex adapters does not itself prove
+reviewer independence.
 
 ------------------------------------------------------------------------
 
@@ -660,6 +698,11 @@ A replacement session reconstructs its context from:
 -   required evidence.
 
 Conversation history shall never be required as durable proof.
+
+Provider session identifiers may be retained for reuse optimization, but
+they are non-authoritative. Durable workflow state, repository evidence
+and structured reports remain the basis for recovery and gate
+evaluation.
 
 ------------------------------------------------------------------------
 
@@ -1601,17 +1644,47 @@ The workflow does not return directly to FIX.
 
 Hosted CI shall be accessed through a provider-neutral `CIProvider`.
 
+V1 shall provide at least one concrete hosted CI adapter. The concrete
+hosted CI adapter required for V1 is:
+
+``` text
+GitHub Actions
+```
+
 Conceptually:
 
 ``` text
+Core / Orchestrator
+        |
+        v
 CIProvider
    |
    +-- GitHubActionsAdapter
    |
-   +-- future providers
+   +-- FakeCIAdapter
 ```
 
-V1 may implement only the provider required by the initial project.
+The GitHub Actions adapter is an infrastructure adapter. The Core shall
+depend on `CIProvider`, not directly on GitHub Actions.
+
+The GitHub Actions adapter is responsible for translating
+provider-specific CI information into the provider-neutral CI model
+defined by this PLAN. It must support the V1 architecture necessary to
+determine CI evidence for the exact `expected_commit`.
+
+Future adapters such as:
+
+``` text
+GitLab CI
+Jenkins
+other hosted CI providers
+```
+
+must remain architecturally possible without redesigning the Core.
+
+Deterministic automated tests shall have a fake/test CI adapter
+implementing the same `CIProvider` abstraction. The fake adapter does not
+replace the required concrete GitHub Actions V1 adapter.
 
 ------------------------------------------------------------------------
 
@@ -1620,6 +1693,9 @@ V1 may implement only the provider required by the initial project.
 CI evidence must reference the expected commit SHA.
 
 A CI GREEN result for commit A cannot satisfy closure for commit B.
+
+The GitHub Actions adapter must not weaken this rule. A green workflow
+for another commit must not satisfy closure for the expected commit.
 
 ------------------------------------------------------------------------
 
@@ -1639,6 +1715,9 @@ NOT_FOUND
 ```
 
 Provider adapters translate external vocabulary into this model.
+
+The GitHub Actions adapter maps provider-specific execution state into
+these statuses. It shall not introduce a second internal CI state model.
 
 ------------------------------------------------------------------------
 
@@ -2342,6 +2421,11 @@ ci:
 
 The exact schema will be defined through implementation tasks.
 
+The configuration must be capable of mapping roles to providers without
+coupling the Core to Claude Code or Codex. Provider names in
+configuration select adapters behind the provider-neutral ports; they do
+not alter workflow authority or review-independence rules.
+
 Configuration and operational state remain distinct:
 
 ``` text
@@ -2937,7 +3021,10 @@ tests.
 
 Agent adapters shall be tested separately from workflow policies.
 
-Use fake/stub AgentRunner implementations for most Core tests.
+Use fake/stub AgentRunner implementations for most Core tests. The fake
+AgentRunner is mandatory for deterministic tests of orchestration, gate
+policies, structured outputs, FIX routing, RE-REVIEW routing,
+lost-session behavior and provider failure behavior.
 
 Live Claude/Codex integration tests shall not be required for every test
 run.
@@ -2997,6 +3084,10 @@ abandon
 dependency blocked
 ```
 
+CI workflow tests shall use a fake `CIProvider` for deterministic Core
+coverage. Separate adapter tests cover GitHub Actions translation into
+the provider-neutral CI model.
+
 ------------------------------------------------------------------------
 
 # 97. Provider Test Doubles
@@ -3012,6 +3103,15 @@ FakeCIProvider
 
 This keeps the Core test suite fast and independent from external
 credentials and network availability.
+
+Fake adapters exist for deterministic tests and do not replace the
+required concrete V1 adapters:
+
+``` text
+Claude Code adapter
+Codex adapter
+GitHub Actions adapter
+```
 
 ------------------------------------------------------------------------
 
@@ -3092,10 +3192,13 @@ sdd_agent/
 ├── adapters/
 │   ├── agents/
 │   │   ├── claude_code
-│   │   └── codex
+│   │   ├── codex
+│   │   └── fake
 │   ├── git/
 │   ├── validation/
 │   ├── ci/
+│   │   ├── github_actions
+│   │   └── fake
 │   └── persistence/
 │
 ├── context/
@@ -3311,7 +3414,7 @@ This is a mandatory architectural property.
 # 107. Architectural Decision Summary
 
 The PLAN incorporates the accepted architecture decisions PLAN-001
-through PLAN-094.
+through PLAN-098.
 
 The principal decisions are:
 
@@ -3328,6 +3431,7 @@ Attempt model
 candidate identity and fingerprint
 provider-neutral AgentRunner
 Claude Code + Codex adapters
+fake AgentRunner for deterministic tests
 independent initial reviewer session
 implementer continuity for FIX where possible
 reviewer continuity for RE-REVIEW where possible
@@ -3344,6 +3448,8 @@ strict waiver model
 ProblemClassifier
 deterministic RoutingPolicy
 CIProvider
+GitHub Actions hosted CI adapter
+fake CI adapter for deterministic tests
 expected-commit CI identity
 CI polling
 structured HumanDecision
@@ -3373,6 +3479,20 @@ no silent adoption of pre-existing dirty state
 structured candidate-bound ImplementationReport
 all non-ignored untracked files included in CandidateSnapshot
 Git ignore rule changes participate in CandidateIdentity
+```
+
+Additional accepted decisions from the controlled return to PLAN:
+
+``` text
+PLAN-097
+Hosted CI concrete adapter for V1 = GitHub Actions.
+The Core remains provider-neutral through CIProvider.
+Fake CI adapter remains mandatory for deterministic tests.
+
+PLAN-098
+Concrete V1 agent adapters = Claude Code + Codex.
+Fake AgentRunner remains mandatory for deterministic tests.
+AgentRole remains distinct from AgentProvider.
 ```
 
 ------------------------------------------------------------------------
@@ -3435,6 +3555,11 @@ Verify this document does not silently change approved product behavior.
 Verify this document provides sufficient architecture for later TASK
 decomposition without prematurely becoming an implementation task list.
 
+After PLAN-097 and PLAN-098, the next independent PLAN review may be
+targeted primarily at those two decisions and regression risks introduced
+by them. The reviewer may still report newly exposed findings elsewhere
+if these modifications create contradictions.
+
 ------------------------------------------------------------------------
 
 # 109. PLAN Review Severity
@@ -3476,7 +3601,7 @@ SPEC = SPEC_READY
 
 PLAN architecture discovery = COMPLETE
 
-PLAN-001 through PLAN-096 = ACCEPTED
+PLAN-001 through PLAN-098 = ACCEPTED
 
 plan.md consolidation = COMPLETE
 
@@ -3495,6 +3620,43 @@ PLAN-095 untracked-file inclusion rule = integrated
 PLAN-096 Git-ignore candidate identity rule = integrated
 
 Independent PLAN Re-review #2 of remaining PLAN-R001 = COMPLETED
+
+Previous PLAN review findings:
+
+BLOCKER = 0
+IMPORTANT = 0
+MINOR = 0
+
+Previous PLAN gate = PLAN_READY
+
+TASKS Decomposition Discovery = STARTED
+Architecture gaps = IDENTIFIED
+
+Architecture gap 1:
+concrete Hosted CI provider for V1
+route = ARCHITECTURE -> PLAN
+
+Architecture gap 2:
+concrete AgentRunner providers required in V1
+route = ARCHITECTURE -> PLAN
+
+PLAN-097 = ACCEPTED
+Hosted CI concrete adapter for V1 = GitHub Actions
+
+PLAN-098 = ACCEPTED
+Concrete V1 agent adapters = Claude Code + Codex
+Fake adapters/runners are mandatory for deterministic tests
+
+PLAN revision = COMPLETE
+
+PLAN returned to CANDIDATE for targeted independent review
+
+Targeted Independent PLAN Review = COMPLETED
+
+PLAN-097 review = PASS
+PLAN-098 review = PASS
+
+Failure scenarios A-I = PASS
 
 Current findings:
 
