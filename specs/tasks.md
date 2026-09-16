@@ -6,7 +6,7 @@
 -   **Phase:** TASKS
 -   **Specification Status:** SPEC_READY
 -   **Plan Status:** PLAN_READY
--   **TASKS Status:** TASKS_NEEDS_RE_REVIEW
+-   **TASKS Status:** TASKS_READY
 -   **Encoding:** UTF-8
 
 ------------------------------------------------------------------------
@@ -1692,13 +1692,23 @@ ordinary push trigger. T002 remains blocked on T001 = CLOSED.
 
 TASKS-BOOTSTRAP-001 = FIXED_PENDING_RE_REVIEW
 
-Current unresolved findings = PENDING RE-REVIEW OF TASKS-BOOTSTRAP-001
+Independent TASKS Re-Review of TASKS-BOOTSTRAP-001 = COMPLETED
 
-Required Routing = RE_REVIEW_TASKS_BOOTSTRAP_001
+TASKS-BOOTSTRAP-001 = RESOLVED
 
-Final Gate = TASKS_NEEDS_RE_REVIEW
+Current unresolved findings:
 
-CODE phase = FORBIDDEN until TASKS_READY is re-established
+BLOCKER = 0
+IMPORTANT = 0
+MINOR = 0
+
+Required Routing = NONE
+
+Final Gate = TASKS_READY
+
+CODE phase = AUTHORIZED
+
+Required Next Action = RESTORE_TASKS_READY_AND_RESUME_T001_READINESS
 ```
 
 ------------------------------------------------------------------------
