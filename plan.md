@@ -5,7 +5,7 @@
 -   **Plan Revision:** V1
 -   **Phase:** PLAN
 -   **Specification Status:** SPEC_READY
--   **Plan Status:** CANDIDATE
+-   **Plan Status:** PLAN_READY
 -   **Encoding:** UTF-8
 
 ------------------------------------------------------------------------
@@ -3494,12 +3494,18 @@ PLAN-R001 = PARTIALLY_RESOLVED in Re-review #1
 PLAN-095 untracked-file inclusion rule = integrated
 PLAN-096 Git-ignore candidate identity rule = integrated
 
-Independent PLAN Re-review of remaining PLAN-R001 = REQUIRED
+Independent PLAN Re-review #2 of remaining PLAN-R001 = COMPLETED
+Re-review #2 gate = PLAN_READY
 
-PLAN status = CANDIDATE
+PLAN-R001 = RESOLVED
+
+BLOCKER = 0
+IMPORTANT = 0
+
+PLAN status = PLAN_READY
 ```
 
-TASKS shall not begin until independent PLAN re-review confirms:
+TASKS may begin because independent PLAN re-review confirmed:
 
 ``` text
 BLOCKER = 0
