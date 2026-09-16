@@ -25,6 +25,7 @@ from sdd_agent.domain.models.enums import (
     ValidationStatus,
     WaiverEligibleCause,
 )
+from sdd_agent.domain.models.event import WorkflowEvent
 from sdd_agent.domain.models.human_decision import HumanDecision
 from sdd_agent.domain.models.identity import EvidenceContext
 from sdd_agent.domain.models.implementation import ImplementationReport
@@ -62,4 +63,5 @@ __all__ = [
     "ValidationStatus",
     "ValidationWaiver",
     "WaiverEligibleCause",
+    "WorkflowEvent",
 ]
