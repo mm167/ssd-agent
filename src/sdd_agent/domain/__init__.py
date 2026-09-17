@@ -8,4 +8,8 @@ shape and RoutingPolicy), and `domain.workflow` (Phase transition
 authorization). PLAN Section 100's package map is a responsibility map, not a
 mandatory directory tree; T005 consolidates "gates" into `domain.policies`
 without collapsing the underlying architectural boundaries.
+
+TASKS T006 adds `domain.policies.waiver_eligibility` (whether a waiver may be
+requested/granted for an obligation+result at all, SPEC Sections 22.1-22.2)
+alongside T005's gate policies, without modifying any of them.
 """

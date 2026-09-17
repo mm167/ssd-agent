@@ -16,6 +16,7 @@ from sdd_agent.domain.policies.readiness import ReadinessDecision, ReadinessPoli
 from sdd_agent.domain.policies.ready_for_review import ReadyForReviewPolicy
 from sdd_agent.domain.policies.ready_to_commit import ReadyToCommitPolicy
 from sdd_agent.domain.policies.review_gate import ReviewGatePolicy
+from sdd_agent.domain.policies.waiver_eligibility import WaiverEligibilityPolicy
 
 __all__ = [
     "ClosurePolicy",
@@ -27,5 +28,6 @@ __all__ = [
     "ReadyForReviewPolicy",
     "ReadyToCommitPolicy",
     "ReviewGatePolicy",
+    "WaiverEligibilityPolicy",
     "dependencies_satisfied",
 ]

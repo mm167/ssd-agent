@@ -6,20 +6,37 @@ Computes whether READY_FOR_REVIEW holds from already-produced evidence: an
 exact current candidate context. It does not execute validations (T006),
 build the reviewer's context package (T008), or decide the
 `ImplementationReport`'s own contents (T007/T011).
+
+T006-IR-002 correction: identifying which of several results for the same
+obligation+context is *current* must never depend on caller-supplied list
+order or on a permissive fallback (SPEC Sections 22.9-22.10; PLAN Section 68
+"gate invalidation must prevent stale evidence from authorizing later
+transitions"). When more than one applicable result exists, `started_at`/
+`completed_at` are the only ordering signal this codebase's architecture
+already defines (PLAN Section 33); if that ordering is not unambiguous for
+every candidate (a missing timestamp, or a genuine tie) this policy refuses
+to guess and rejects the obligation as unresolved (mirroring SPEC Section 12:
+ambiguous identity blocks progression rather than being silently resolved),
+exactly like an unauthorized `Phase` transition is rejected rather than
+coerced (`sdd_agent.domain.workflow.transitions`). A mandatory-timestamp
+model change was deliberately not made: every real result produced by T006's
+`ValidationRunner` implementations already carries `started_at`/
+`completed_at`, so ambiguity only arises from hand-built or malformed
+evidence, which is exactly the case that should block rather than silently
+resolve.
 """
 
 from __future__ import annotations
 
 from collections.abc import Sequence
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import datetime
 
 from sdd_agent.domain.models.enums import Condition, ImplementationCompletionStatus, ValidationStatus
 from sdd_agent.domain.models.identity import EvidenceContext
 from sdd_agent.domain.models.implementation import ImplementationReport
 from sdd_agent.domain.models.validation import ValidationObligation, ValidationResult, ValidationWaiver
 from sdd_agent.domain.policies.decision import GateDecision
-
-_EPOCH = datetime.min.replace(tzinfo=timezone.utc)
 
 
 class ReadyForReviewPolicy:
@@ -64,7 +81,14 @@ def _evaluate_required_obligation(
     waivers: Sequence[ValidationWaiver],
     current_context: EvidenceContext,
 ) -> list[str]:
-    result = _latest_applicable_result(obligation.obligation_id, results, current_context)
+    lookup = _latest_applicable_result(obligation.obligation_id, results, current_context)
+    if lookup.ambiguous:
+        return [
+            f"multiple validation results for required obligation {obligation.obligation_id} "
+            "cannot be unambiguously identified as current (missing or tied timestamps); "
+            "evidence ordering must not be inferred from caller-supplied list order"
+        ]
+    result = lookup.result
     if result is None:
         return [f"no applicable validation result for required obligation {obligation.obligation_id}"]
 
@@ -83,19 +107,50 @@ def _evaluate_required_obligation(
     return []
 
 
+@dataclass(frozen=True, slots=True)
+class _ResultLookup:
+    """The outcome of trying to identify the current result for one obligation.
+
+    `ambiguous=True` means applicable results exist but cannot be safely
+    ordered (see module docstring); it is distinct from `result=None` with
+    `ambiguous=False`, which means no applicable result exists at all.
+    """
+
+    result: ValidationResult | None
+    ambiguous: bool
+
+
 def _latest_applicable_result(
     obligation_id: str,
     results: Sequence[ValidationResult],
     current_context: EvidenceContext,
-) -> ValidationResult | None:
+) -> _ResultLookup:
     applicable = [
         result
         for result in results
         if result.obligation_id == obligation_id and result.context.applies_to(current_context)
     ]
     if not applicable:
-        return None
-    return max(applicable, key=lambda result: result.completed_at or result.started_at or _EPOCH)
+        return _ResultLookup(result=None, ambiguous=False)
+    if len(applicable) == 1:
+        return _ResultLookup(result=applicable[0], ambiguous=False)
+
+    keyed: list[tuple[ValidationResult, datetime | None]] = [
+        (result, result.completed_at or result.started_at) for result in applicable
+    ]
+    if any(key is None for _, key in keyed):
+        # At least one candidate has no timestamp at all: its position
+        # relative to the others cannot be determined, so the whole set is
+        # ambiguous rather than silently falling back to list order.
+        return _ResultLookup(result=None, ambiguous=True)
+
+    max_key = max(key for _, key in keyed)
+    winners = [result for result, key in keyed if key == max_key]
+    if len(winners) > 1:
+        # A genuine tie at the maximum: still ambiguous, not resolved by
+        # whichever tied result happens to appear first in `results`.
+        return _ResultLookup(result=None, ambiguous=True)
+    return _ResultLookup(result=winners[0], ambiguous=False)
 
 
 def _applicable_waiver(
