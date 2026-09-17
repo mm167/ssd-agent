@@ -1,0 +1,10 @@
+{
+  "attempt_id": "001",
+  "expected_commit": "989efbef11060675f1b05a8d9854aa3f4e7e719e",
+  "observed_at": "2026-09-17T08:06:02.170723Z",
+  "provider_run_reference": "human-observed GitHub Actions run for this exact SHA (local gh CLI authentication unavailable in this environment)",
+  "result_id": "ci-recovery-001",
+  "schema_version": 1,
+  "status": "green",
+  "task_id": "T005"
+}

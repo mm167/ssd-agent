@@ -23,17 +23,25 @@ _SECRET_KEY_PATTERN = re.compile(
 )
 
 # Recognizable provider token formats may occur inside free-text diagnostics or
-# session metadata, where a secret-shaped field name is unavailable. The
-# patterns stay deliberately narrow so ordinary opaque identifiers remain
-# valid evidence.
+# session metadata, where a secret-shaped field name is unavailable. These are
+# explicit credential families, not generic entropy heuristics, so ordinary
+# opaque identifiers (Git SHAs, fingerprints, UUIDs, report IDs) remain valid
+# evidence.
+_BARE_CREDENTIAL_FAMILIES = (
+    # GitHub classic fine-grained/application token prefixes.
+    r"(?:gh[pousr]_[A-Za-z0-9_]{8,}|github_pat_[A-Za-z0-9_]{8,})",
+    # Claude/Anthropic and OpenAI/Codex-style API keys.
+    r"(?:sk-ant-[A-Za-z0-9_-]{8,}|sk-(?:proj-|live-)?[A-Za-z0-9_-]{8,})",
+    # Google API keys.
+    r"AIza[A-Za-z0-9_-]{20,}",
+    # AWS access-key identifiers.
+    r"(?:AKIA|ASIA)[0-9A-Z]{16}",
+    # Slack bot/app/user tokens.
+    r"xox[baprs]-[A-Za-z0-9-]{8,}",
+)
+
 _BARE_CREDENTIAL_PATTERN = re.compile(
-    r"(?<![A-Za-z0-9])(?:"
-    r"(?:gh[pousr]_[A-Za-z0-9_]{8,}|github_pat_[A-Za-z0-9_]{8,})|"
-    r"sk-(?:ant-)?[A-Za-z0-9_-]{8,}|"
-    r"AIza[A-Za-z0-9_-]{20,}|"
-    r"(?:AKIA|ASIA)[0-9A-Z]{16}|"
-    r"xox[baprs]-[A-Za-z0-9-]{8,}"
-    r")(?![A-Za-z0-9])"
+    r"(?<![A-Za-z0-9])(?:" + "|".join(_BARE_CREDENTIAL_FAMILIES) + r")(?![A-Za-z0-9])"
 )
 
 

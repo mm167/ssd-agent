@@ -47,6 +47,46 @@ def test_reject_secrets_allows_clean_configuration() -> None:
     reject_secrets({"agents": {"readiness": "fake"}, "ci": {"provider": "fake"}})
 
 
+@pytest.mark.parametrize(
+    "credential_text",
+    [
+        "provider returned ghp_SYNTHETICCredentialValue",
+        "provider returned github_pat_SYNTHETICCredentialValue",
+        "provider returned sk-ant-syntheticCredentialValue",
+        "provider returned sk-proj-syntheticCredentialValue",
+        "provider returned AKIA1234567890ABCDEF",
+        "provider returned AIzaSyntheticCredentialValue",
+    ],
+)
+def test_find_secret_like_values_detects_bare_provider_credentials_in_free_text(
+    credential_text: str,
+) -> None:
+    data = {"payload": {"agent_stdout": credential_text}}
+
+    found = find_secret_like_values(data)
+
+    assert found == ["payload.agent_stdout"]
+
+
+@pytest.mark.parametrize(
+    "safe_text",
+    [
+        "commit 0123456789abcdef0123456789abcdef01234567",
+        "fingerprint e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "session fake-session-2026-09-17",
+        "uuid 123e4567-e89b-12d3-a456-426614174000",
+        "report readiness-report-2026-09-17-001",
+        "ordinary diagnostic text without credentials",
+    ],
+)
+def test_find_secret_like_values_allows_legitimate_identifiers_in_free_text(
+    safe_text: str,
+) -> None:
+    data = {"payload": {"diagnostics": safe_text}}
+
+    assert find_secret_like_values(data) == []
+
+
 def test_parse_config_rejects_secret_before_schema_validation() -> None:
     yaml_with_secret = """
 agents:

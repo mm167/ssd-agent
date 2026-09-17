@@ -1,0 +1,36 @@
+{
+  "changed_paths": [
+    "src/sdd_agent/domain/__init__.py",
+    "src/sdd_agent/domain/policies/__init__.py",
+    "src/sdd_agent/domain/policies/closure.py",
+    "src/sdd_agent/domain/policies/commit_authorization.py",
+    "src/sdd_agent/domain/policies/decision.py",
+    "src/sdd_agent/domain/policies/human_commit_gate.py",
+    "src/sdd_agent/domain/policies/readiness.py",
+    "src/sdd_agent/domain/policies/ready_for_review.py",
+    "src/sdd_agent/domain/policies/ready_to_commit.py",
+    "src/sdd_agent/domain/policies/review_gate.py",
+    "src/sdd_agent/domain/routing/__init__.py",
+    "src/sdd_agent/domain/routing/classification.py",
+    "src/sdd_agent/domain/workflow/__init__.py",
+    "src/sdd_agent/domain/workflow/next_action.py",
+    "src/sdd_agent/domain/workflow/transitions.py"
+  ],
+  "completion_status": "completed",
+  "context": {
+    "artifact_contract_identity": null,
+    "attempt_id": "001",
+    "candidate_id": "989efbef11060675f1b05a8d9854aa3f4e7e719e",
+    "task_id": "T005"
+  },
+  "implementation_role": "implementer",
+  "known_limitations": "No formal ValidationObligation catalog exists for this candidate: T006 (ValidationRunner/obligations), which owns discovering and cataloguing required obligations, is not yet implemented. obligations=[] below is therefore an honest empty set, not evidence of validations being skipped.",
+  "produced_at": "2026-09-17T08:06:02.163355Z",
+  "report_id": "impl-recovery-001",
+  "schema_version": 1,
+  "task_scope_summary": "T005 Workflow Core, Gates, Routing, State Machine (recorded retroactively during T005 recovery/reconciliation; original implementation predates any Orchestrator persistence wiring)",
+  "validations_run_by_agent": [
+    "uv run pytest -q -> 437 passed (full suite at HEAD 989efbef11060675f1b05a8d9854aa3f4e7e719e)",
+    "uv run pytest tests/domain/policies tests/domain/routing tests/domain/workflow -q -> 145 passed"
+  ]
+}

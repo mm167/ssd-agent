@@ -1,0 +1,13 @@
+{
+  "choice": "RECOVERY_APPROVAL: candidate 989efbef11060675f1b05a8d9854aa3f4e7e719e was already committed and pushed to origin/main before any Orchestrator/Human-Commit-Gate tooling (T011-T013/T017) existed to gate it in real time. An independent recovery review of this exact immutable candidate found BLOCKER=0, IMPORTANT=0, MINOR=0. The human explicitly ratifies commit-approval applicability for this exact candidate for T005 closure-evaluation purposes only. This record is NOT a claim that a pre-commit Human Commit Gate approval occurred in the SPEC Section 35 designed sequence.",
+  "context": {
+    "artifact_contract_identity": null,
+    "attempt_id": "001",
+    "candidate_id": "989efbef11060675f1b05a8d9854aa3f4e7e719e",
+    "task_id": "T005"
+  },
+  "decided_at": "2026-09-17T08:06:02.168620Z",
+  "decision_id": "decision-recovery-001",
+  "decision_type": "commit_approval",
+  "schema_version": 1
+}

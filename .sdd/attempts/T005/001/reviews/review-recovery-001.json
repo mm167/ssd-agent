@@ -1,0 +1,12 @@
+{
+  "context": {
+    "artifact_contract_identity": null,
+    "attempt_id": "001",
+    "candidate_id": "989efbef11060675f1b05a8d9854aa3f4e7e719e",
+    "task_id": "T005"
+  },
+  "findings": [],
+  "produced_at": "2026-09-17T08:06:02.165530Z",
+  "report_id": "review-recovery-001",
+  "schema_version": 1
+}

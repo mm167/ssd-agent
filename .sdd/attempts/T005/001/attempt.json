@@ -1,0 +1,10 @@
+{
+  "attempt_id": "001",
+  "baseline_sha": "fc6228fb5356c973589c75c6f0fadd06b9353648",
+  "candidate_id": "989efbef11060675f1b05a8d9854aa3f4e7e719e",
+  "condition": null,
+  "next_authorized_action": null,
+  "phase": "closed",
+  "schema_version": 1,
+  "task_id": "T005"
+}

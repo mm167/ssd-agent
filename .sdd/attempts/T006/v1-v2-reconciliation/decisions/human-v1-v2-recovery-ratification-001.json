@@ -1,0 +1,13 @@
+{
+  "choice": "RECOVERY_RATIFICATION_CURRENT: APPROVE V1_TO_V2 RECOVERY RATIFICATION. This is a current human recovery decision, not contemporaneous historical gate evidence. The human ratifies that T006 was intentionally implemented under the previous SDD workflow, subjected to the review/fix process applicable at that time, reached human commit authorization under that process, was committed and pushed, and had Hosted CI observed GREEN for its applicable historical implementation commit. The absence of complete structured historical evidence is a migration/persistence gap. This does not assert that missing structured evidence existed historically. This current recovery/ratification evidence in this candidate must not itself be treated as durable closing evidence until this reconciliation candidate has completed independent review, human approval, commit, push, and Hosted CI GREEN for the exact resulting commit. It does not claim the historical implementation commit contained this reconciliation evidence. Future tasks must not use this exceptional mechanism as a shortcut around normal V2 gates.",
+  "context": {
+    "artifact_contract_identity": null,
+    "attempt_id": "v1-v2-reconciliation",
+    "candidate_id": "2d3c91c071ea04b3abb15f6a337e61a39f366436",
+    "task_id": "T006"
+  },
+  "decided_at": "2026-09-17T10:31:36.385141Z",
+  "decision_id": "human-v1-v2-recovery-ratification-001",
+  "decision_type": "commit_approval",
+  "schema_version": 1
+}

@@ -1,0 +1,10 @@
+{
+  "attempt_id": "v1-v2-reconciliation",
+  "expected_commit": "661233fac88bf19e9cf1d9a61563db60165b4b47",
+  "observed_at": "2026-09-17T10:31:36.391183Z",
+  "provider_run_reference": "GitHub Actions CI run 35205085855 for 661233fac88bf19e9cf1d9a61563db60165b4b47 (https://github.com/mm167/ssd-agent/actions/runs/35205085855) observed as completed/success during current V1 to V2 reconciliation",
+  "result_id": "ci-v1-v2-recovery-001",
+  "schema_version": 1,
+  "status": "green",
+  "task_id": "T007"
+}
