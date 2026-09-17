@@ -22,6 +22,20 @@ _SECRET_KEY_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+# Recognizable provider token formats may occur inside free-text diagnostics or
+# session metadata, where a secret-shaped field name is unavailable. The
+# patterns stay deliberately narrow so ordinary opaque identifiers remain
+# valid evidence.
+_BARE_CREDENTIAL_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9])(?:"
+    r"(?:gh[pousr]_[A-Za-z0-9_]{8,}|github_pat_[A-Za-z0-9_]{8,})|"
+    r"sk-(?:ant-)?[A-Za-z0-9_-]{8,}|"
+    r"AIza[A-Za-z0-9_-]{20,}|"
+    r"(?:AKIA|ASIA)[0-9A-Z]{16}|"
+    r"xox[baprs]-[A-Za-z0-9-]{8,}"
+    r")(?![A-Za-z0-9])"
+)
+
 
 def find_secret_like_keys(data: Any, *, _path: str = "") -> list[str]:
     """Return dotted paths of any mapping keys that look like secrets."""
@@ -58,6 +72,11 @@ def _has_embedded_url_password(value: str) -> bool:
     return bool(parsed.password)
 
 
+def _has_bare_credential_token(value: str) -> bool:
+    """Detect narrowly recognizable provider tokens embedded in text."""
+    return bool(_BARE_CREDENTIAL_PATTERN.search(value))
+
+
 def find_secret_like_values(data: Any, *, _path: str = "") -> list[str]:
     """Return dotted paths of any scalar values that look like embedded credentials."""
     found: list[str] = []
@@ -68,7 +87,9 @@ def find_secret_like_values(data: Any, *, _path: str = "") -> list[str]:
     elif isinstance(data, list):
         for index, item in enumerate(data):
             found.extend(find_secret_like_values(item, _path=f"{_path}[{index}]"))
-    elif isinstance(data, str) and _has_embedded_url_password(data):
+    elif isinstance(data, str) and (
+        _has_embedded_url_password(data) or _has_bare_credential_token(data)
+    ):
         found.append(_path or "<root>")
     return found
 

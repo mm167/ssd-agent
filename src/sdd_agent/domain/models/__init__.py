@@ -12,6 +12,15 @@ gate/policy behavior and routing decisions (T005), validation execution
 """
 
 from sdd_agent.domain.models.attempt import Attempt, NextAuthorizedAction
+from sdd_agent.domain.models.agent import (
+    AgentExecutionStatus,
+    AgentReportType,
+    AgentRequest,
+    AgentResult,
+    AgentStructuredReport,
+    build_successful_agent_result,
+    report_type_for,
+)
 from sdd_agent.domain.models.candidate import (
     CandidateEntry,
     CandidateEntryKind,
@@ -48,6 +57,11 @@ from sdd_agent.domain.models.validation import (
 __all__ = [
     "CURRENT_SCHEMA_VERSION",
     "Attempt",
+    "AgentExecutionStatus",
+    "AgentReportType",
+    "AgentRequest",
+    "AgentResult",
+    "AgentStructuredReport",
     "CIResult",
     "CIStatus",
     "CandidateEntry",
@@ -76,4 +90,6 @@ __all__ = [
     "WaiverEligibleCause",
     "WorkflowEvent",
     "WorktreeStatus",
+    "build_successful_agent_result",
+    "report_type_for",
 ]
