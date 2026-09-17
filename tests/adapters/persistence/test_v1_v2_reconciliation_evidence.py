@@ -76,13 +76,13 @@ def test_v1_v2_reconciliation_inventory_is_fixed_and_git_trackable() -> None:
     for relative_path in _REQUIRED_EVIDENCE_FILES:
         assert (_REPO_ROOT / relative_path).is_file(), relative_path
         result = subprocess.run(
-            ["git", "ls-files", "--others", "--exclude-standard", relative_path.as_posix()],
+            ["git", "ls-files", "--error-unmatch", relative_path.as_posix()],
             cwd=_REPO_ROOT,
             check=False,
             capture_output=True,
             text=True,
         )
-        assert result.returncode == 0, result.stderr
+        assert result.returncode == 0, result.stdout + result.stderr
         assert result.stdout.splitlines() == [relative_path.as_posix()]
 
 
