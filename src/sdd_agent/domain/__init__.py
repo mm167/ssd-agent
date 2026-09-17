@@ -1,7 +1,11 @@
 """Domain layer: workflow representation, evidence contracts, gates, routing (PLAN Section 100).
 
-TASKS T002 owns only `domain.models` (data contracts and model-level
-invariants). `domain.workflow`, `domain.gates`, `domain.routing`, and
-`domain.policies` are reserved package boundaries for T005 and are not
-created by T002.
+TASKS T002 owns `domain.models` (data contracts and model-level invariants).
+TASKS T005 owns `domain.policies` (PLAN Section 11 "Gate Policies": Readiness,
+ReadyForReview, ReviewGate, ReadyToCommit, HumanCommitGate,
+CommitAuthorization, Closure), `domain.routing` (ProblemClassifier output
+shape and RoutingPolicy), and `domain.workflow` (Phase transition
+authorization). PLAN Section 100's package map is a responsibility map, not a
+mandatory directory tree; T005 consolidates "gates" into `domain.policies`
+without collapsing the underlying architectural boundaries.
 """
